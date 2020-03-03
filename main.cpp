@@ -87,6 +87,14 @@ int main()
     __m128 centerZ  = _mm_set1_ps(((V4*)(&center_mm))->data[2]);
     __m128 centerZZ = _mm_mul_ps(centerZ, (*(__m128*)&mtx2));
     __m128 sumXYZ   = _mm_add_ps(_mm_add_ps(_mm_add_ps(centerXX, centerYY), centerZZ), (*(__m128*)&T));
+    __m128 newMin   = sumXYZ;
+    __m128 newMax   = sumXYZ;
+
+    // b.m_vMin += (glm::min( aX, bX ) + glm::min( aY, bY ) + glm::min( aZ, bZ ));
+    __m128 AABBMin  = _mm_add_ps(newMin, _mm_add_ps(_mm_add_ps(_mm_min_ps(ax, bx), _mm_min_ps(ay, by)), _mm_min_ps(az, bz)));
+
+    // b.m_vMax += (glm::max( aX, bX ) + glm::max( aY, bY ) + glm::max( aZ, bZ ));
+    __m128 AABBMax  = _mm_add_ps(newMax, _mm_add_ps(_mm_add_ps(_mm_max_ps(ax, bx), _mm_max_ps(ay, by)), _mm_max_ps(az, bz)));
 
     return 0;
 }
