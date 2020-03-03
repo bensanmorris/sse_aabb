@@ -56,5 +56,27 @@ int main()
     __m128 local_minx = _mm_set1_ps(((V4*)(&local_min))->data[0]);
     __m128 ax = _mm_mul_ps((*(__m128*)&mtx0), local_minx);
 
+    // bX = mtx[0]*localMax[0];
+    __m128 local_maxx = _mm_set1_ps(((V4*)(&local_max))->data[0]);
+    __m128 bx = _mm_mul_ps((*(__m128*)&mtx0), local_max);
+
+    // aY = mtx[1]*localMin[1];
+    V4 mtx1 = { 0.f, 1.f, 0.f, 0.f };
+    __m128 local_miny = _mm_set1_ps(((V4*)(&local_min))->data[1]);
+    __m128 ay = _mm_mul_ps((*(__m128*)&mtx1), local_miny);
+
+    // bY = mtx[1]*localMax[1];
+    __m128 local_maxy = _mm_set1_ps(((V4*)(&local_max))->data[1]);
+    __m128 by = _mm_mul_ps((*(__m128*)&mtx1), local_maxy);
+
+    // aZ = mtx[2]*localMin[2];
+    V4 mtx2 = { 0.f, 0.f, 1.f, 0.f };
+    __m128 local_minz = _mm_set1_ps(((V4*)(&local_min))->data[2]);
+    __m128 az = _mm_mul_ps((*(__m128*)&mtx2), local_minz);
+
+    // bZ = mtx[2]*localMax[2];
+    __m128 local_maxz = _mm_set1_ps(((V4*)(&local_max))->data[2]);
+    __m128 bz = _mm_mul_ps((*(__m128*)&mtx2), local_maxz);
+
     return 0;
 }
