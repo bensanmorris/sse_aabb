@@ -35,31 +35,26 @@ int main()
         float data[4];
     };
 
-    // min
     V4 min { 1.f, 2.f, 3.f, 4.f };
-    __m128* min_mm = (__m128*)&min;
-
-    // max
     V4 max { 2.f, 3.f, 4.f, 5.f };
-    __m128* max_mm = (__m128*)&max;
 
     // min + max
-    __m128  min_max_sum_mm = _mm_add_ps(*min_mm, *max_mm);
+    __m128  min_max_sum_mm = _mm_add_ps((*(__m128*)&min), (*(__m128*)&max));
 
     // center i.e. (min + max) * 0.5
     V4 half{ 0.5f, 0.5f, 0.5f, 0.5f };
-    __m128* half_mm = (__m128*)&half;
-    __m128  center_mm = _mm_mul_ps(min_max_sum_mm, *half_mm);
-    V4&     center = (V4&)center_mm;
+    __m128 center_mm = _mm_mul_ps(min_max_sum_mm, (*(__m128*)&half));
 
     // min - center
-    __m128 local_min = _mm_sub_ps(*min_mm, center_mm);
+    __m128 local_min = _mm_sub_ps((*(__m128*)&min), center_mm);
 
     // max - center
-    __m128 local_max = _mm_sub_ps(*max_mm, center_mm);
+    __m128 local_max = _mm_sub_ps((*(__m128*)&max), center_mm);
 
-    // todo
-    // ...
+    // aX = mtx[0]*localMin[0];
+    V4 mtx0 = { 1.f, 0.f, 0.f, 0.f };
+    __m128 local_minx = _mm_set1_ps(((V4*)(&local_min))->data[0]);
+    __m128 ax = _mm_mul_ps((*(__m128*)&mtx0), local_minx);
 
     return 0;
 }
