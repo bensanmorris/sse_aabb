@@ -34,7 +34,7 @@ int main()
         float data[4];
     };
 
-    // add
+    // (a.m_vMin + a.m_vMax)
     V4 a { 1.f, 2.f, 3.f, 4.f };
     V4 b { 2.f, 3.f, 4.f, 5.f };
     __m128* pa = (__m128*)&a;
@@ -43,7 +43,12 @@ int main()
     V4&     pc = (V4&)cc;
     std::cout << pc.data[0] << "," << pc.data[1] << "," << pc.data[2] << "," << pc.data[3] << std::endl;
 
-    //
+    // (a.m_vMin + a.m_vMax) * Vector3(0.5f)
+    V4 d { 0.5f, 0.5f, 0.5f, 0.5f };
+    __m128* pd = (__m128*)&d;
+    __m128  ee = _mm_mul_ps(cc, *pd);
+    V4&     pe = (V4&)ee;
+    std::cout << pe.data[0] << "," << pe.data[1] << "," << pe.data[2] << "," << pe.data[3] << std::endl;
 
     return 0;
 }
