@@ -29,26 +29,37 @@ int main()
     b.m_vMax += (glm::max( aX, bX ) + glm::max( aY, bY ) + glm::max( aZ, bZ ));
     */
 
+    // a 16 byte aligned 4 float vector
     struct alignas(16) V4
     {
         float data[4];
     };
 
-    // (a.m_vMin + a.m_vMax)
-    V4 a { 1.f, 2.f, 3.f, 4.f };
-    V4 b { 2.f, 3.f, 4.f, 5.f };
-    __m128* pa = (__m128*)&a;
-    __m128* pb = (__m128*)&b;
-    __m128  cc = _mm_add_ps(*pa, *pb);
-    V4&     pc = (V4&)cc;
-    std::cout << pc.data[0] << "," << pc.data[1] << "," << pc.data[2] << "," << pc.data[3] << std::endl;
+    // min
+    V4 min { 1.f, 2.f, 3.f, 4.f };
+    __m128* min_mm = (__m128*)&min;
 
-    // (a.m_vMin + a.m_vMax) * Vector3(0.5f)
-    V4 d { 0.5f, 0.5f, 0.5f, 0.5f };
-    __m128* pd = (__m128*)&d;
-    __m128  ee = _mm_mul_ps(cc, *pd);
-    V4&     pe = (V4&)ee;
-    std::cout << pe.data[0] << "," << pe.data[1] << "," << pe.data[2] << "," << pe.data[3] << std::endl;
+    // max
+    V4 max { 2.f, 3.f, 4.f, 5.f };
+    __m128* max_mm = (__m128*)&max;
+
+    // min + max
+    __m128  min_max_sum_mm = _mm_add_ps(*min_mm, *max_mm);
+
+    // center i.e. (min + max) * 0.5
+    V4 half{ 0.5f, 0.5f, 0.5f, 0.5f };
+    __m128* half_mm = (__m128*)&half;
+    __m128  center_mm = _mm_mul_ps(min_max_sum_mm, *half_mm);
+    V4&     center = (V4&)center_mm;
+
+    // min - center
+    __m128 local_min = _mm_sub_ps(*min_mm, center_mm);
+
+    // max - center
+    __m128 local_max = _mm_sub_ps(*max_mm, center_mm);
+
+    // todo
+    // ...
 
     return 0;
 }
