@@ -1,7 +1,7 @@
 #include <iostream>
 #include <chrono>
 
-//#define USE_SSE
+#define USE_SSE
 #ifdef USE_SSE
     #include <immintrin.h>
 #else
@@ -13,19 +13,24 @@
 
 int main()
 {
-
     using namespace std::chrono;
     auto t1 = high_resolution_clock::now();
-    for(int i = 0; i < 100000; i++)
-    {
 
 #ifdef USE_SSE
-
     // a 16 byte aligned 4 float vector
     struct alignas(16) V4
     {
         float data[4];
     };
+    __m128 AABBMin, AABBMax;
+#else
+    Vector3 newMin, newMax;
+#endif
+
+    double dummy = 0.0;
+    for(int i = 0; i < 100000000; i++)
+    {
+#ifdef USE_SSE
 
     static const V4 min { 1.f, 2.f, 3.f, 4.f };
     static const V4 max { 2.f, 3.f, 4.f, 5.f };
@@ -83,10 +88,12 @@ int main()
     __m128 newMax   = sumXYZ;
 
     // b.m_vMin += (glm::min( aX, bX ) + glm::min( aY, bY ) + glm::min( aZ, bZ ));
-    __m128 AABBMin  = _mm_add_ps(newMin, _mm_add_ps(_mm_add_ps(_mm_min_ps(ax, bx), _mm_min_ps(ay, by)), _mm_min_ps(az, bz)));
+    AABBMin         = _mm_add_ps(newMin, _mm_add_ps(_mm_add_ps(_mm_min_ps(ax, bx), _mm_min_ps(ay, by)), _mm_min_ps(az, bz)));
 
     // b.m_vMax += (glm::max( aX, bX ) + glm::max( aY, bY ) + glm::max( aZ, bZ ));
-    __m128 AABBMax  = _mm_add_ps(newMax, _mm_add_ps(_mm_add_ps(_mm_max_ps(ax, bx), _mm_max_ps(ay, by)), _mm_max_ps(az, bz)));
+    AABBMax         = _mm_add_ps(newMax, _mm_add_ps(_mm_add_ps(_mm_max_ps(ax, bx), _mm_max_ps(ay, by)), _mm_max_ps(az, bz)));
+
+    dummy+=(((V4*)&AABBMin)->data[0]);
 
 #else
 
@@ -110,18 +117,31 @@ int main()
     Vector3 bZ = mtx[2]*localMax[2];
 
     // Start at the world-space center of the box.
-    Vector3 newMin, newMax;
     newMin = newMax = t + mtx[0]*center.x + mtx[1]*center.y + mtx[2]*center.z;
 
     // Update the final AABB.
     newMin += (glm::min( aX, bX ) + glm::min( aY, bY ) + glm::min( aZ, bZ ));
     newMax += (glm::max( aX, bX ) + glm::max( aY, bY ) + glm::max( aZ, bZ ));
 
+    dummy+=newMin.x;
+
 #endif
     }
     auto t2 = high_resolution_clock::now();
     auto secs = std::chrono::duration_cast<std::chrono::seconds>(t2 - t1);
     std::cout << secs.count() << std::endl;
+
+#ifdef USE_SSE
+    V4* newMin = ((V4*)&AABBMin);
+    V4* newMax = ((V4*)&AABBMax);
+    std::cout << "min = " << newMin->data[0] << "," << newMin->data[1] << "," << newMin->data[2] << std::endl;
+    std::cout << "max = " << newMax->data[0] << "," << newMax->data[1] << "," << newMax->data[2] << std::endl;
+    std::cout << dummy << std::endl;
+#else
+    std::cout << "min = " << newMin.x << "," << newMin.y << "," << newMin.z << std::endl;
+    std::cout << "max = " << newMax.x << "," << newMax.y << "," << newMax.z << std::endl;
+    std::cout << dummy << std::endl;
+#endif
 
     return 0;
 }
