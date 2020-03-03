@@ -37,6 +37,7 @@ int main()
 
     V4 min { 1.f, 2.f, 3.f, 4.f };
     V4 max { 2.f, 3.f, 4.f, 5.f };
+    V4 T   { 0.f, 0.f, 0.f, 0.f };
 
     // min + max
     __m128  min_max_sum_mm = _mm_add_ps((*(__m128*)&min), (*(__m128*)&max));
@@ -77,6 +78,15 @@ int main()
     // bZ = mtx[2]*localMax[2];
     __m128 local_maxz = _mm_set1_ps(((V4*)(&local_max))->data[2]);
     __m128 bz = _mm_mul_ps((*(__m128*)&mtx2), local_maxz);
+
+    // b.m_vMin = b.m_vMax = t + mtx[0]*center.x + mtx[1]*center.y + mtx[2]*center.z;
+    __m128 centerX  = _mm_set1_ps(((V4*)(&center_mm))->data[0]);
+    __m128 centerXX = _mm_mul_ps(centerX, (*(__m128*)&mtx0));
+    __m128 centerY  = _mm_set1_ps(((V4*)(&center_mm))->data[1]);
+    __m128 centerYY = _mm_mul_ps(centerY, (*(__m128*)&mtx1));
+    __m128 centerZ  = _mm_set1_ps(((V4*)(&center_mm))->data[2]);
+    __m128 centerZZ = _mm_mul_ps(centerZ, (*(__m128*)&mtx2));
+    __m128 sumXYZ   = _mm_add_ps(_mm_add_ps(_mm_add_ps(centerXX, centerYY), centerZZ), (*(__m128*)&T));
 
     return 0;
 }
