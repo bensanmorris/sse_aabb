@@ -24,5 +24,5 @@ Compiled under gcc 7.4.0 for release with optimisations disabled (-O0):
 ```
 ### Links
 
-Intel intrinsics guide: https://software.intel.com/sites/landingpage/IntrinsicsGuide/#
-Intel assembler guide: https://software.intel.com/sites/default/files/managed/a4/60/325383-sdm-vol-2abcd.pdf
+- Intel intrinsics guide: https://software.intel.com/sites/landingpage/IntrinsicsGuide/#
+- Intel assembler guide: https://software.intel.com/sites/default/files/managed/a4/60/325383-sdm-vol-2abcd.pdf
