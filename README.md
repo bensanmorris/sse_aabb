@@ -1,1 +1,1 @@
-Experimentation with SSE intrinsics. I modified my AABB (Axis Aligned Bounding Box) routine providing both SSE and non-SSE versions. Assuming I haven't made a mistake the SSE version is approx 4x faster than the non-SSE version.
+Experiment with SSE / non-SSE variants of updating an AABB by rotating the original AABB. Uses picobench for micro-benchmarking.
