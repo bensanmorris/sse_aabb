@@ -22,3 +22,7 @@ Compiled under gcc 7.4.0 for release with optimisations disabled (-O0):
            benchmark_simd |    8192 |     0.474 |      57 |  0.284 | 17265216.7
 ===============================================================================
 ```
+### Links
+
+Intel intrinsics guide: https://software.intel.com/sites/landingpage/IntrinsicsGuide/#
+Intel assembler guide: https://software.intel.com/sites/default/files/managed/a4/60/325383-sdm-vol-2abcd.pdf
