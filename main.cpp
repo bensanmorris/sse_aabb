@@ -93,6 +93,8 @@ void UpdateAABB(Vector3 min, Vector3 max, Vector3 T, Matrix3 mtx, Vector3& newMi
     newMax += (glm::max( aX, bX ) + glm::max( aY, bY ) + glm::max( aZ, bZ ));
 }
 
+static const int ITERATION_FACTOR = 10000;
+
 static void benchmark_normal(picobench::state& s)
 {
     static const Vector3 min { 1.f, 2.f, 3.f };
@@ -101,7 +103,7 @@ static void benchmark_normal(picobench::state& s)
     static const Vector3 t   {};
 
     Vector3 newMin, newMax;
-    for(int i = 0; i < s.iterations(); i++)
+    for(auto _ : s)
     {
         UpdateAABB(min, max, t, mtx, newMin, newMax);
     }
@@ -118,7 +120,7 @@ static void benchmark_simd(picobench::state& s)
     static Vector4SIMD mtx2{ 0.f, 0.f, 1.f, 0.f }; // Rz
 
     Vector4SIMD newMin, newMax;
-    for(int i = 0; i < s.iterations(); i++)
+    for(auto _ : s)
     {
         UpdateAABB_SIMD(min, max, T, mtx0, mtx1, mtx2, newMin, newMax);
     }
