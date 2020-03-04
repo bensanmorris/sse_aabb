@@ -6,6 +6,7 @@ Experiment with SSE / non-SSE variants of updating an AABB by rotating the origi
 
 Compiled under gcc 7.4.0 for release with optimisations disabled (-O0):
 
+```
 ===============================================================================
    Name (baseline is *)   |   Dim   |  Total ms |  ns/op  |Baseline| Ops/second
 ===============================================================================
@@ -20,3 +21,4 @@ Compiled under gcc 7.4.0 for release with optimisations disabled (-O0):
        benchmark_normal * |    8192 |     1.669 |     203 |      - |  4907605.0
            benchmark_simd |    8192 |     0.474 |      57 |  0.284 | 17265216.7
 ===============================================================================
+```
