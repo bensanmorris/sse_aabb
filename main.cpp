@@ -18,8 +18,8 @@ void UpdateAABB_SIMD(Vector4SIMD min, Vector4SIMD max, Vector4SIMD T, Vector4SIM
     __m128  min_max_sum_mm = _mm_add_ps((*(__m128*)&min), (*(__m128*)&max));
 
     // center i.e. (min + max) * 0.5
-    Vector4SIMD half{ 0.5f, 0.5f, 0.5f, 0.5f };
-    __m128 center_mm = _mm_mul_ps(min_max_sum_mm, (*(__m128*)&half));
+    __m128 half      = _mm_set1_ps(0.5f);
+    __m128 center_mm = _mm_mul_ps(min_max_sum_mm, half);
 
     // min - center
     __m128 local_min = _mm_sub_ps((*(__m128*)&min), center_mm);
