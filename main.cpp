@@ -15,48 +15,48 @@ struct alignas(16) Vector4SIMD
 void UpdateAABB_SIMD(Vector4SIMD min, Vector4SIMD max, Vector4SIMD T, Vector4SIMD mtx[3], Vector4SIMD& newMin, Vector4SIMD& newMax)
 {
     // min + max
-    __m128  min_max_sum = _mm_add_ps((*(__m128*)&min), (*(__m128*)&max));
+    __m128  min_max_sum_mm = _mm_add_ps((*(__m128*)&min), (*(__m128*)&max));
 
     // center i.e. (min + max) * 0.5
-    __m128 half = _mm_set1_ps(0.5f);
-    __m128 center = _mm_mul_ps(min_max_sum, half);
+    __m128 half      = _mm_set1_ps(0.5f);
+    __m128 center_mm = _mm_mul_ps(min_max_sum_mm, half);
 
     // min - center
-    __m128 local_min = _mm_sub_ps((*(__m128*)&min), center);
+    __m128 local_min = _mm_sub_ps((*(__m128*)&min), center_mm);
 
     // max - center
-    __m128 local_max = _mm_sub_ps((*(__m128*)&max), center);
+    __m128 local_max = _mm_sub_ps((*(__m128*)&max), center_mm);
 
     // aX = mtx[0]*localMin[0];
-    __m128 local_minx = _mm_set_ss(((Vector4SIMD*)(&local_min))->data[0]);
+    __m128 local_minx = _mm_set1_ps(((Vector4SIMD*)(&local_min))->data[0]);
     __m128 ax = _mm_mul_ps((*(__m128*)&mtx[0]), local_minx);
 
     // bX = mtx[0]*localMax[0];
-    __m128 local_maxx = _mm_set_ss(((Vector4SIMD*)(&local_max))->data[0]);
+    __m128 local_maxx = _mm_set1_ps(((Vector4SIMD*)(&local_max))->data[0]);
     __m128 bx = _mm_mul_ps((*(__m128*)&mtx[0]), local_max);
 
     // aY = mtx[1]*localMin[1];
-    __m128 local_miny = _mm_set_ss(((Vector4SIMD*)(&local_min))->data[1]);
+    __m128 local_miny = _mm_set1_ps(((Vector4SIMD*)(&local_min))->data[1]);
     __m128 ay = _mm_mul_ps((*(__m128*)&mtx[1]), local_miny);
 
     // bY = mtx[1]*localMax[1];
-    __m128 local_maxy = _mm_set_ss(((Vector4SIMD*)(&local_max))->data[1]);
+    __m128 local_maxy = _mm_set1_ps(((Vector4SIMD*)(&local_max))->data[1]);
     __m128 by = _mm_mul_ps((*(__m128*)&mtx[1]), local_maxy);
 
     // aZ = mtx[2]*localMin[2];
-    __m128 local_minz = _mm_set_ss(((Vector4SIMD*)(&local_min))->data[2]);
+    __m128 local_minz = _mm_set1_ps(((Vector4SIMD*)(&local_min))->data[2]);
     __m128 az = _mm_mul_ps((*(__m128*)&mtx[2]), local_minz);
 
     // bZ = mtx[2]*localMax[2];
-    __m128 local_maxz = _mm_set_ss(((Vector4SIMD*)(&local_max))->data[2]);
+    __m128 local_maxz = _mm_set1_ps(((Vector4SIMD*)(&local_max))->data[2]);
     __m128 bz = _mm_mul_ps((*(__m128*)&mtx[2]), local_maxz);
 
     // b.m_vMin = b.m_vMax = t + mtx[0]*center.x + mtx[1]*center.y + mtx[2]*center.z;
-    __m128 centerX  = _mm_set_ss(((Vector4SIMD*)(&center))->data[0]);
+    __m128 centerX  = _mm_set1_ps(((Vector4SIMD*)(&center_mm))->data[0]);
     __m128 centerXX = _mm_mul_ps(centerX, (*(__m128*)&mtx[0]));
-    __m128 centerY  = _mm_set_ss(((Vector4SIMD*)(&center))->data[1]);
+    __m128 centerY  = _mm_set1_ps(((Vector4SIMD*)(&center_mm))->data[1]);
     __m128 centerYY = _mm_mul_ps(centerY, (*(__m128*)&mtx[1]));
-    __m128 centerZ  = _mm_set_ss(((Vector4SIMD*)(&center))->data[2]);
+    __m128 centerZ  = _mm_set1_ps(((Vector4SIMD*)(&center_mm))->data[2]);
     __m128 centerZZ = _mm_mul_ps(centerZ, (*(__m128*)&mtx[2]));
     __m128 sumXYZ   = _mm_add_ps(_mm_add_ps(_mm_add_ps(centerXX, centerYY), centerZZ), (*(__m128*)&T));
     newMin          = (*(Vector4SIMD*)&sumXYZ);
