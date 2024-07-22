@@ -8,12 +8,23 @@
 typedef glm::vec3 Vector3;
 typedef glm::mat3 Matrix3;
 
-struct alignas(16) Vector4SIMD
+void UpdateAABB_SIMD(Vector3 min_, Vector3 max_, Vector3 T_, Matrix3 mtx_, Vector3& newMin_, Vector3& newMax_)
 {
-    float data[4];
-};
-void UpdateAABB_SIMD(Vector4SIMD min, Vector4SIMD max, Vector4SIMD T, Vector4SIMD mtx[3], Vector4SIMD& newMin, Vector4SIMD& newMax)
-{
+    struct alignas(16) Vector4SIMD
+    {
+        float data[4];
+    };
+
+    Vector4SIMD min = {min_.x, min_.y, min_.z, 0.f};        
+    Vector4SIMD max = {max_.x, max_.y, max_.z, 0.f};
+    Vector4SIMD T   = {T_.x, T_.y, T_.z, 0.f};
+    Vector4SIMD mtx[3] = {
+        {mtx_[0].x, mtx_[0].y, mtx_[0].z, 0.f},
+        {mtx_[1].x, mtx_[1].y, mtx_[1].z, 0.f},
+        {mtx_[2].x, mtx_[2].y, mtx_[2].z, 0.f},
+    };    
+    Vector4SIMD newMin, newMax;
+
     // min + max
     __m128  min_max_sum_mm = _mm_add_ps((*(__m128*)&min), (*(__m128*)&max));
 
@@ -67,6 +78,14 @@ void UpdateAABB_SIMD(Vector4SIMD min, Vector4SIMD max, Vector4SIMD T, Vector4SIM
 
     // b.m_vMax += (glm::max( aX, bX ) + glm::max( aY, bY ) + glm::max( aZ, bZ ));
     (*(__m128*)&newMax) = _mm_add_ps((*(__m128*)&newMax), _mm_add_ps(_mm_add_ps(_mm_max_ps(ax, bx), _mm_max_ps(ay, by)), _mm_max_ps(az, bz)));
+
+    newMin_.x = newMin.data[0];
+    newMin_.y = newMin.data[1];
+    newMin_.z = newMin.data[2];
+
+    newMax_.x = newMax.data[0];
+    newMax_.y = newMax.data[1];
+    newMax_.z = newMax.data[2];
 }
 
 void UpdateAABB(Vector3 min, Vector3 max, Vector3 T, Matrix3 mtx, Vector3& newMin, Vector3& newMax)
@@ -110,17 +129,15 @@ PICOBENCH(benchmark_normal);
 
 static void benchmark_simd(picobench::state& s)
 {
-    static Vector4SIMD min { 1.f, 2.f, 3.f, 4.f };
-    static Vector4SIMD max { 2.f, 3.f, 4.f, 5.f };
-    static Vector4SIMD T   { 0.f, 0.f, 0.f, 0.f };      // Tx, Ty, Tz
-    static Vector4SIMD mtx[3]{ { 1.f, 0.f, 0.f, 0.f },  // Rx
-                               { 0.f, 1.f, 0.f, 0.f },  // Ry
-                               { 0.f, 0.f, 1.f, 0.f }}; // Rz
+    static const Vector3 min { 1.f, 2.f, 3.f };
+    static const Vector3 max { 2.f, 3.f, 4.f };
+    static const Matrix3 mtx { 1.f };
+    static const Vector3 t   {};
 
-    Vector4SIMD newMin, newMax;
+    Vector3 newMin, newMax;
     for(auto _ : s)
     {
-        UpdateAABB_SIMD(min, max, T, mtx, newMin, newMax);
+        UpdateAABB_SIMD(min, max, t, mtx, newMin, newMax);
     }
 }
 PICOBENCH(benchmark_simd);
