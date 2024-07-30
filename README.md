@@ -1,6 +1,6 @@
 ### About
 
-Experiment with SSE / non-SSE variants of updating an AABB by rotating the original AABB. Uses picobench for micro-benchmarking.
+Experiment with SSE / non-SSE variants of updating an AABB by rotating the original AABB. Uses picobench for micro-benchmarking. [Updated to cover multi-versioning here](https://github.com/bensanmorris/sse_aabb_multiversioned).
 
 ### Results
 
